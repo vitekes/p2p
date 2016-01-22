@@ -1,0 +1,16 @@
+# Byte-compiled
+*.py[cod]
+
+# Pytest
+__pycache__/
+
+# Unittest
+.cache
+
+.pylint.d/
+
+*.swp
+*.log
+*.csv
+*.tsv
+.idea

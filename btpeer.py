@@ -127,14 +127,19 @@ class BTPeer:
     def start_stabilizer(self, stabilizer, delay):
         """ Registers and starts a stabilizer function with this peer.
         The function will be activated every <delay> seconds.
+        :param stabilizer
+        :param delay
 
         """
-        t = threading.Thread(target = self.__run_stabilizer, args = [stabilizer, delay])
+        t = threading.Thread(target = self.__run_stabilizer, args=[stabilizer, delay])
         t.start()
 
     # --------------------------------------------------------------------------
     def add_handler(self, msgtype, handler):
-        """ Registers the handler for the given message type with this peer """
+        """ Registers the handler for the given message type with this peer
+        :param msgtype
+        :param handler
+        """
         assert len(msgtype) == 4
         self.handlers[msgtype] = handler
 
@@ -156,10 +161,11 @@ class BTPeer:
     # --------------------------------------------------------------------------
     def add_peer(self, peer_id, host, port):
         """ Adds a peer name and host:port mapping to the known list of peers.
-
+        :param peer_id
+        :param host
+        :param port
         """
-        if peer_id not in self.peers and (self.max_peers == 0 or
-                         len(self.peers) < self.max_peers):
+        if peer_id not in self.peers and (self.max_peers == 0 or len(self.peers) < self.max_peers):
             self.peers[peer_id] = (host, int(port))
             return True
         else:
@@ -168,13 +174,17 @@ class BTPeer:
     # --------------------------------------------------------------------------
     def get_peer(self, peer_id):
 
-        """ Returns the (host, port) tuple for the given peer name """
+        """ Returns the (host, port) tuple for the given peer name
+        :param peer_id
+        """
         assert peer_id in self.peers    # maybe make this just a return NULL?
         return self.peers[peer_id]
 
     # --------------------------------------------------------------------------
     def remove_peer(self, peer_id):
-        """ Removes peer information from the known list of peers. """
+        """ Removes peer information from the known list of peers.
+        :param peer_id
+        """
         if peer_id in self.peers:
             del self.peers[peer_id]
 
@@ -184,18 +194,30 @@ class BTPeer:
         list of peers. The functions add_peer_at, get_peer_at, and remove_peer_at
         should not be used concurrently with add_peer, get_peer, and/or
         remove_peer.
-
+        :param loc
+        :param peer_id
+        :param host
+        :param port
         """
         self.peers[loc] = (peer_id, host, int(port))
 
     # --------------------------------------------------------------------------
     def get_peer_at(self, loc):
+        """
+        :param loc:
+        :return:
+        """
         if loc not in self.peers:
             return None
         return self.peers[loc]
 
     # --------------------------------------------------------------------------
     def remove_peer_at(self, loc):
+        """
+        Stub
+        :param loc:
+        :return:
+        """
         # TODO fix this shit
         # remove_peer(self, loc)
         pass
@@ -224,7 +246,8 @@ class BTPeer:
     def make_server_socket(self, port, backlog=5):
         """ Constructs and prepares a server socket listening on the given
         port.
-
+        :param port
+        :param backlog
         """
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -246,6 +269,10 @@ class BTPeer:
         will be returned.
 
         Returns None if the message could not be routed.
+        :param peer_id
+        :param msgtype
+        :param msgdata
+        :param waitreply
         """
 
         if self.router:
@@ -253,7 +280,7 @@ class BTPeer:
         if not self.router or not next_pid:
             self.__debug('Unable to route %s to %s' % (msgtype, peer_id))
             return None
-        # host,port = self.peers[nextpid]
+
         return self.connect_and_send(host, port, msgtype, msgdata,
                                      pid=next_pid,
                                      waitreply=waitreply)
@@ -267,7 +294,12 @@ class BTPeer:
 
         Connects and sends a message to the specified host:port. The host's
         reply, if expected, will be returned as a list of tuples.
-
+        :param host
+        :param port
+        :param msgtype
+        :param msgdata
+        :param pid
+        :param waitreply
         """
         msgreply = []
         one_reply = None
